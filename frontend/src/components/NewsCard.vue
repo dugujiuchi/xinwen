@@ -2,7 +2,7 @@
   <div class="news-card">
     <div class="news-card-header">
       <span class="source-tag">{{ news.source_name }}</span>
-      <span v-if="isToday" class="today-badge">今日</span>
+      <span v-if="isToday()" class="today-badge">今日</span>
       <span class="time-text">{{ formatTime(news.pub_time) }}</span>
     </div>
     <h3 class="news-card-title">
@@ -36,14 +36,18 @@ function formatTime(timeStr) {
 function isToday() {
   if (!props.news.pub_time) return false
   const d = new Date(props.news.pub_time)
-  const now = new Date()
-  return d.getMonth() === now.getMonth() && d.getDate() === now.getDate()
+  return d.toDateString() === new Date().toDateString()
 }
 
+// HTML 转义映射
+const HTML_ENTITIES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }
+function escapeHtml(str) { return String(str).replace(/[&<>"']/g, ch => HTML_ENTITIES[ch]) }
+
 function highlightTitle(title) {
-  if (!props.keyword || !title) return title
+  const safe = escapeHtml(title)
+  if (!props.keyword || !safe) return safe
   const regex = new RegExp(`(${escapeRegExp(props.keyword)})`, 'gi')
-  return title.replace(regex, '<span class="highlight">$1</span>')
+  return safe.replace(regex, '<span class="highlight">$1</span>')
 }
 
 function escapeRegExp(str) {

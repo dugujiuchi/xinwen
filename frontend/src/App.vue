@@ -2,7 +2,10 @@
   <div id="app-root">
     <header class="app-header">
       <div class="container">
-        <h1 class="app-title">宁波资规大数据中心 · 资讯聚合</h1>
+        <h1 class="app-title">
+          <span class="title-full">宁波资规大数据中心 · 资讯聚合</span>
+          <span class="title-short">资讯聚合</span>
+        </h1>
       </div>
     </header>
     <main class="container">
@@ -14,3 +17,17 @@
 <script setup>
 // 根组件，暂无逻辑
 </script>
+
+<style scoped>
+.title-short {
+  display: none;
+}
+@media (max-width: 480px) {
+  .title-full {
+    display: none;
+  }
+  .title-short {
+    display: inline;
+  }
+}
+</style>

@@ -1,8 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy import (
-    Column, Integer, String, Text, DateTime, Boolean, Float,
-    ForeignKey,
+    Column, Integer, String, Text, DateTime, Boolean, Float, ForeignKey,
 )
 from sqlalchemy.sql import func
 from sqlalchemy.dialects.postgresql import ARRAY
@@ -19,7 +18,7 @@ class Topic(Base):
     type = Column(String(20), default="preset", comment="类型: preset/custom")
     description = Column(Text, comment="描述")
     keywords = Column(ARRAY(String), comment="关联搜索关键词")
-    created_by = Column(Integer, ForeignKey("users.id"), nullable=True, comment="创建者")
+    created_by = Column(Integer, nullable=True, comment="创建者（第二期关联 users 表）")
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 

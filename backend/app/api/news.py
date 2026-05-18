@@ -27,9 +27,24 @@ def _build_search_query(db: Session, params: NewsQueryParams):
             )
         )
 
-    # 来源过滤
+    # 来源过滤（按名称，向下兼容）
     if params.source:
         query = query.filter(News.source_name == params.source)
+
+    # 来源过滤（按 ID）
+    if params.source_id is not None:
+        query = query.filter(News.source_id == params.source_id)
+
+    # 栏目过滤（精确匹配）
+    if params.category:
+        query = query.filter(News.category == params.category)
+
+    # 标签过滤（模糊匹配，tags 为逗号分隔字符串）
+    if params.tags:
+        for tag in params.tags.split(","):
+            tag = tag.strip()
+            if tag:
+                query = query.filter(News.tags.ilike(f"%{tag}%"))
 
     return query
 
@@ -40,10 +55,16 @@ def list_news(
     size: int = Query(20, ge=1, le=100),
     search: Optional[str] = None,
     source: Optional[str] = None,
+    source_id: Optional[int] = Query(None),
+    category: Optional[str] = Query(None),
+    tags: Optional[str] = Query(None),
     db: Session = Depends(get_db),
 ):
     """获取新闻列表（分页、搜索、过滤）"""
-    params = NewsQueryParams(page=page, size=size, search=search, source=source)
+    params = NewsQueryParams(
+        page=page, size=size, search=search, source=source,
+        source_id=source_id, category=category, tags=tags,
+    )
     query = _build_search_query(db, params)
 
     total = query.count()

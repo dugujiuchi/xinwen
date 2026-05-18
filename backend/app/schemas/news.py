@@ -11,6 +11,10 @@ class NewsItem(BaseModel):
     link: str
     source_name: str
     summary: Optional[str] = None
+    category: Optional[str] = None
+    source_id: Optional[int] = None
+    content: Optional[str] = None
+    tags: Optional[str] = None
     pub_time: Optional[datetime] = None
     crawled_at: Optional[datetime] = None
 
@@ -23,4 +27,6 @@ class NewsQueryParams(BaseModel):
     size: int = 20
     search: Optional[str] = None
     source: Optional[str] = None
-    topic_id: Optional[int] = None
+    source_id: Optional[int] = None
+    category: Optional[str] = None
+    tags: Optional[str] = None

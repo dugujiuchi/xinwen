@@ -4,7 +4,7 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     # PostgreSQL
     postgres_user: str = "newsuser"
-    postgres_password: str = "changeme123"
+    postgres_password: str = "123456789"
     postgres_db: str = "news_hub"
     postgres_host: str = "localhost"
     postgres_port: int = 5432
@@ -15,10 +15,14 @@ class Settings(BaseSettings):
     environment: str = "development"
     log_level: str = "info"
 
+    # 管理员
+    admin_enabled: bool = True
+    admin_password: str = "admin123"
+
     @property
     def database_url(self) -> str:
         return (
-            f"postgresql://{self.postgres_user}:{self.postgres_password}"
+            f"postgresql+psycopg://{self.postgres_user}:{self.postgres_password}"
             f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
         )
 
