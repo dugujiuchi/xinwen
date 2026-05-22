@@ -1,104 +1,110 @@
-# ×ÊÑ¶¾ÛºÏÆ½Ì¨ (News Hub)
+# èµ„è®¯èšåˆå¹³å° (News Hub)
 
-Äş²¨×Ê¹æ´óÊı¾İÖĞĞÄÄÚ²¿Ê¹ÓÃµÄĞÂÎÅ×ÊÑ¶¾ÛºÏÆ½Ì¨£¬×Ô¶¯×¥È¡¶à¸öÍøÕ¾ĞÂÎÅ¡¢»ã¾ÛÕ¹Ê¾£¬Ö§³Ö·ÖÀàä¯ÀÀ¡¢¹Ø¼ü´ÊËÑË÷ºÍ·ÖÒ³¹ıÂË¡£ÃæÏò 5-20 ÈËĞ¡ÍÅ¶Ó£¬²¿ÊğÔÚ°¢ÀïÔÆ ECS£¨2C2G£©¡£
+å®æ³¢èµ„è§„å¤§æ•°æ®ä¸­å¿ƒå†…éƒ¨ä½¿ç”¨çš„èµ„è®¯èšåˆå¹³å°ï¼Œè‡ªåŠ¨æŠ“å–å¤šç«™ç‚¹æ–°é—»ã€åˆ†ç±»å±•ç¤ºï¼Œæ”¯æŒæ ç›®ç­›é€‰ã€æ ‡ç­¾è¿‡æ»¤å’Œå…³é”®è¯æœç´¢ã€‚é¢å‘ 5-20 äººå°å›¢é˜Ÿï¼Œéƒ¨ç½²åœ¨é˜¿é‡Œäº‘ ECSï¼ˆ2C2Gï¼‰ã€‚
 
-## ¼¼ÊõÕ»
+## æŠ€æœ¯æ ˆ
 
-| ²ã¼¶ | ¼¼Êõ |
+| å±‚çº§ | æŠ€æœ¯ |
 |------|------|
-| ºó¶Ë¿ò¼Ü | FastAPI 0.115 |
+| åç«¯æ¡†æ¶ | FastAPI 0.115 |
 | ORM | SQLAlchemy 2.0 + Alembic |
-| Êı¾İ¿â | PostgreSQL 15 |
-| ÅÀ³æÒıÇæ | Playwright£¨ÎŞÍ· Chromium£© |
-| ¶¨Ê±ÈÎÎñ | APScheduler |
-| Ç°¶Ë | Vue 3 (Composition API) + Vite 5 |
-| Â·ÓÉ | Vue Router 4 |
-| HTTP ¿Í»§¶Ë | Axios |
-| ·´Ïò´úÀí | Nginx |
-| ÈİÆ÷»¯ | Docker Compose |
+| æ•°æ®åº“ | PostgreSQL 16 |
+| æµè§ˆå™¨æŠ“å– | Playwrightï¼ˆæ— å¤´ Chromiumï¼‰ |
+| å®šæ—¶è°ƒåº¦ | APSchedulerï¼ˆæ¯ 4 å°æ—¶ï¼‰ |
+| å‰ç«¯ | Vue 3 (Composition API) + Vite 5 |
+| è·¯ç”± | Vue Router 4 |
+| HTTP å®¢æˆ·ç«¯ | Axios |
+| åå‘ä»£ç† | Nginx |
+| å®¹å™¨åŒ– | Docker Composeï¼ˆ4 ä¸ªæœåŠ¡ï¼‰ |
 
-## ÏîÄ¿½á¹¹
+## é¡¹ç›®ç»“æ„
 
 ```
 web_aisearch/
-©À©¤©¤ docker-compose.yml          # 4 ÈİÆ÷±àÅÅ
-©À©¤©¤ .env.example                # »·¾³±äÁ¿Ä£°å
-©¦
-©À©¤©¤ backend/                    # Python ºó¶Ë
-©¦   ©À©¤©¤ Dockerfile              # API ¾µÏñ
-©¦   ©À©¤©¤ Dockerfile.crawler      # ÅÀ³æ¾µÏñ£¨º¬ Chromium£©
-©¦   ©À©¤©¤ requirements.txt
-©¦   ©À©¤©¤ alembic.ini
-©¦   ©À©¤©¤ alembic/                # Êı¾İ¿âÇ¨ÒÆ½Å±¾
-©¦   ©À©¤©¤ app/
-©¦   ©¦   ©À©¤©¤ main.py             # FastAPI Èë¿Ú
-©¦   ©¦   ©À©¤©¤ config.py           # pydantic-settings ÅäÖÃ
-©¦   ©¦   ©À©¤©¤ database.py         # SQLAlchemy Á¬½Ó¹ÜÀí
-©¦   ©¦   ©À©¤©¤ models/             # Êı¾İÄ£ĞÍ£¨news / topic / crawl_log£©
-©¦   ©¦   ©À©¤©¤ schemas/            # Pydantic ÇëÇó/ÏìÓ¦Ìå
-©¦   ©¦   ©À©¤©¤ api/                # RESTful Â·ÓÉ£¨news / crawl£©
-©¦   ©¦   ©¸©¤©¤ crawlers/           # ÅÀ³æ¿ò¼Ü£¨»ùÀà + ¹ÜÀíÆ÷ + ¾ßÌåÅÀ³æ£©
-©¦   ©À©¤©¤ scripts/init_db.sql     # Êı¾İ¿â³õÊ¼»¯
-©¦   ©¸©¤©¤ tests/
-©¦
-©À©¤©¤ frontend/                   # Vue 3 Ç°¶Ë
-©¦   ©À©¤©¤ Dockerfile              # ¶à½×¶Î¹¹½¨£¨Node ¡ú Nginx£©
-©¦   ©À©¤©¤ nginx.conf
-©¦   ©À©¤©¤ vite.config.js
-©¦   ©¸©¤©¤ src/
-©¦       ©À©¤©¤ main.js
-©¦       ©À©¤©¤ App.vue
-©¦       ©À©¤©¤ router/index.js
-©¦       ©À©¤©¤ api/index.js        # Axios ·â×°
-©¦       ©À©¤©¤ views/Home.vue      # Ê×Ò³
-©¦       ©À©¤©¤ components/         # 6 ¸ö UI ×é¼ş
-©¦       ©¸©¤©¤ assets/style.css
-©¦
-©¸©¤©¤ docs/                       # Éè¼ÆÎÄµµÓëÊµÊ©¼Æ»®
+â”œâ”€â”€ docker-compose.yml              # 4 ä¸ªæœåŠ¡ç¼–æ’
+â”œâ”€â”€ .env.example                    # ç¯å¢ƒå˜é‡æ¨¡æ¿
+â”œâ”€â”€ README.md
+â”œâ”€â”€ ROADMAP.md                      # é•¿æœŸè§„åˆ’
+â”‚
+â”œâ”€â”€ backend/                        # Python åç«¯
+â”‚   â”œâ”€â”€ Dockerfile                  # API é•œåƒ
+â”‚   â”œâ”€â”€ Dockerfile.crawler          # çˆ¬è™«é•œåƒï¼ˆå« Chromiumï¼Œçº¦ 1GBï¼‰
+â”‚   â”œâ”€â”€ requirements.txt
+â”‚   â”œâ”€â”€ run.py                      # å…¥å£è„šæœ¬
+â”‚   â”œâ”€â”€ alembic.ini
+â”‚   â”œâ”€â”€ alembic/                    # æ•°æ®åº“è¿ç§»è„šæœ¬
+â”‚   â”œâ”€â”€ app/
+â”‚   â”‚   â”œâ”€â”€ main.py                 # FastAPI åº”ç”¨å…¥å£ï¼ˆè·¯ç”±æ³¨å†Œ + lifespanï¼‰
+â”‚   â”‚   â”œâ”€â”€ config.py               # pydantic-settings é…ç½®ï¼ˆç¯å¢ƒå˜é‡é©±åŠ¨ï¼‰
+â”‚   â”‚   â”œâ”€â”€ database.py             # SQLAlchemy è¿æ¥ç®¡ç†
+â”‚   â”‚   â”œâ”€â”€ crawler_scheduler.py    # APScheduler å®šæ—¶è°ƒåº¦
+â”‚   â”‚   â”œâ”€â”€ models/                 # æ•°æ®æ¨¡å‹ï¼šNews / Source / Topic / CrawlLog
+â”‚   â”‚   â”œâ”€â”€ schemas/                # Pydantic è¯·æ±‚/å“åº” schema
+â”‚   â”‚   â”œâ”€â”€ api/                    # è·¯ç”±ï¼šnewsï¼ˆå…¬å¼€ï¼‰/ adminï¼ˆç®¡ç†ç«¯ï¼‰/ authï¼ˆé‰´æƒï¼‰
+â”‚   â”‚   â””â”€â”€ crawlers/               # æŠ“å–å¼•æ“ï¼šå·¥å‚ + ç®¡ç†å™¨ + 3 ç§æŠ“å–å™¨
+â”‚   â”œâ”€â”€ scripts/
+â”‚   â”‚   â”œâ”€â”€ init_db.sql             # æ•°æ®åº“åˆå§‹åŒ–
+â”‚   â”‚   â””â”€â”€ seed_sources.py         # ç§å­æ•°æ®æºï¼ˆ23 ä¸ªé¢„ç½®æºï¼‰
+â”‚   â””â”€â”€ tests/
+â”‚
+â”œâ”€â”€ frontend/                       # Vue 3 å‰ç«¯
+â”‚   â”œâ”€â”€ Dockerfile                  # å¤šé˜¶æ®µæ„å»ºï¼ˆNode æ„å»º + Nginx è¿è¡Œï¼‰
+â”‚   â”œâ”€â”€ nginx.conf                  # SPA è·¯ç”± + /api/ åå‘ä»£ç†
+â”‚   â”œâ”€â”€ vite.config.js
+â”‚   â””â”€â”€ src/
+â”‚       â”œâ”€â”€ main.js
+â”‚       â”œâ”€â”€ App.vue
+â”‚       â”œâ”€â”€ router/index.js         # è·¯ç”±ï¼šé¦–é¡µ / + ç®¡ç†ç«¯ /admin/*
+â”‚       â”œâ”€â”€ api/index.js            # Axios å°è£… + API å‡½æ•°
+â”‚       â”œâ”€â”€ views/                  # é¡µé¢ï¼šHome / AdminLayout / SourceList / SourceForm / CrawlLogs
+â”‚       â”œâ”€â”€ components/             # 6 ä¸ª UI ç»„ä»¶ï¼ˆSearchBar / TabNav / TagFilter / NewsGrid / NewsCard / Paginationï¼‰
+â”‚       â””â”€â”€ assets/style.css        # å…¨å±€æ ·å¼ï¼ˆå«ç§»åŠ¨ç«¯é€‚é…ï¼‰
+â”‚
+â””â”€â”€ docs/                           # è®¾è®¡æ–‡æ¡£ä¸å®æ–½è®¡åˆ’
 ```
 
-## ¿ìËÙ¿ªÊ¼
+## å¿«é€Ÿå¼€å§‹
 
-### Ç°ÖÃÌõ¼ş
+### å‰ææ¡ä»¶
 
 - [Docker](https://docs.docker.com/get-docker/) 20.10+
 - [Docker Compose](https://docs.docker.com/compose/install/) 2.0+
 
-### Docker ²¿Êğ£¨ÍÆ¼ö£©
+### Docker éƒ¨ç½²ï¼ˆæ¨èï¼‰
 
 ```bash
-# 1. ¿ËÂ¡ÏîÄ¿
-git clone <repo-url>
+# 1. å…‹éš†é¡¹ç›®
+git clone https://github.com/dugujiuchi/xinwen.git web_aisearch
 cd web_aisearch
 
-# 2. ¸´ÖÆ»·¾³±äÁ¿
+# 2. å¤åˆ¶ç¯å¢ƒå˜é‡ï¼ˆå¯é€‰ï¼Œä¸åˆ›å»ºåˆ™ä½¿ç”¨é»˜è®¤å€¼ï¼‰
 cp .env.example .env
 
-# 3. Æô¶¯È«²¿·şÎñ
-docker-compose up -d
+# 3. å¯åŠ¨å…¨éƒ¨æœåŠ¡
+docker compose up -d
 
-# 4. ²é¿´ÔËĞĞ×´Ì¬
-docker-compose ps
+# 4. æŸ¥çœ‹æœåŠ¡çŠ¶æ€
+docker compose ps
 ```
 
-Æô¶¯ºó·ÃÎÊ£º
-- Ç°¶ËÒ³Ãæ£º`http://localhost`
-- API ÎÄµµ£¨Swagger£©£º`http://localhost:8000/docs`
-- ½¡¿µ¼ì²é£º`http://localhost:8000/api/health`
+å¯åŠ¨åè®¿é—®ï¼š
+- å‰ç«¯é¦–é¡µï¼š`http://localhost`
+- ç®¡ç†åå°ï¼š`http://localhost/admin`ï¼ˆå¯†ç è§ `.env` ä¸­ `ADMIN_PASSWORD`ï¼Œé»˜è®¤ `admin123`ï¼‰
+- API æ–‡æ¡£ï¼ˆSwaggerï¼‰ï¼š`http://localhost:8000/docs`
+- å¥åº·æ£€æŸ¥ï¼š`http://localhost:8000/api/health`
 
-### ±¾µØ¿ª·¢
+### æœ¬åœ°å¼€å‘
 
-**ºó¶Ë**£¨ĞèÒª Python 3.11+ ºÍ±¾µØ PostgreSQL£©£º
+**åç«¯**ï¼ˆéœ€è¦ Python 3.11+ å’Œæœ¬åœ° PostgreSQLï¼‰ï¼š
 
 ```bash
 cd backend
 pip install -r requirements.txt
-
-# ĞŞ¸Ä .env ÖĞ POSTGRES_HOST Îª localhost
+# ä¿®æ”¹ .env ä¸­ POSTGRES_HOST ä¸º localhost
 uvicorn app.main:app --reload --port 8000
 ```
 
-**Ç°¶Ë**£º
+**å‰ç«¯**ï¼š
 
 ```bash
 cd frontend
@@ -106,104 +112,205 @@ npm install
 npm run dev
 ```
 
-Ç°¶Ë¿ª·¢·şÎñÆ÷Ä¬ÈÏÔËĞĞÔÚ `http://localhost:5173`£¬API ÇëÇó×Ô¶¯´úÀíµ½ `localhost:8000`¡£
+å‰ç«¯å¼€å‘æœåŠ¡å™¨é»˜è®¤è¿è¡Œåœ¨ `http://localhost:5173`ï¼ŒAPI è¯·æ±‚è‡ªåŠ¨ä»£ç†åˆ° `localhost:8000`ã€‚
 
-## ²¿Êğ¼Ü¹¹
+## æ¶æ„
 
 ```
-                    ©°©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©´
-           :80 ©¤©¤©¤©¤©¤©¦   nginx     ©¦©¤©¤©¤©¤ /api/* ·´Ïò´úÀí ©¤©¤©¤©¤©´
-                    ©¸©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¼                         ©¦
-                                                           ¨‹
-                                                  ©°©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©´
-                   :8000 ©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¦   api (FastAPI)  ©¦
-                                                  ©¸©¤©¤©¤©¤©¤©¤©¤©¤©Ğ©¤©¤©¤©¤©¤©¤©¤©¤©¼
-                                                           ©¦
-                                                           ¨‹
-                                                  ©°©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©´
-                   :5432 ©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¦   postgres (PG)  ©¦
-                                                  ©¸©¤©¤©¤©¤©¤©¤©¤©¤©Ğ©¤©¤©¤©¤©¤©¤©¤©¤©¼
-                                                           ¡ø
-                                                  ©°©¤©¤©¤©¤©¤©¤©¤©¤©Ø©¤©¤©¤©¤©¤©¤©¤©¤©´
-                                                  ©¦  crawler        ©¦
-                                                  ©¦ (Playwright +   ©¦
-                                                  ©¦  APScheduler)   ©¦
-                                                  ©¸©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¼
+                     â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+            :80 â”€â”€â”€â”€â–¶â”‚      nginx       â”‚â”€â”€â”€â”€ /api/* ä»£ç† â”€â”€â”€â”€â–¶
+                     â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                              â”‚
+              â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+              â–¼               â–¼               â–¼
+    â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+    â”‚ é™æ€æ–‡ä»¶     â”‚  â”‚  api:8000    â”‚  â”‚  crawler     â”‚
+    â”‚ (SPA)       â”‚  â”‚  (FastAPI)   â”‚  â”‚  (Playwright â”‚
+    â”‚             â”‚  â”‚              â”‚  â”‚   + Scheduler)â”‚
+    â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜  â””â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”˜  â””â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”˜
+                             â”‚                 â”‚
+                             â–¼                 â–¼
+                     â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+                     â”‚      postgres:5432 (PG16)     â”‚
+                     â”‚      æ•°æ®æŒä¹…åŒ– (volume)      â”‚
+                     â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 ```
 
-- **nginx**£ºÇ°¶Ë SPA ¾²Ì¬ÎÄ¼ş + ·´Ïò´úÀí `/api/` µ½ºó¶Ë
-- **api**£ºFastAPI ·şÎñ£¬Ìá¹© RESTful ½Ó¿Ú£¬Æô¶¯Ê±×Ô¶¯½¨±í
-- **postgres**£ºÊı¾İ³Ö¾Ã»¯£¬volume ¹ÒÔØ `pgdata`
-- **crawler**£ºPlaywright ÅÀ³æÈİÆ÷£¬APScheduler ¶¨Ê±Ö´ĞĞ£¨Æô¶¯Ö´ĞĞÒ»´Î + Ã¿ 4 Ğ¡Ê± + Ã¿Ìì 9:10£©
+- **nginx**ï¼šå‰ç«¯ SPA é™æ€æ–‡ä»¶ + `/api/` åå‘ä»£ç†åˆ° FastAPI
+- **api**ï¼šRESTful æ¥å£ + ç®¡ç†ç«¯ API + åº”ç”¨å¯åŠ¨æ—¶è‡ªåŠ¨å»ºè¡¨ä¸ç§å­æ•°æ®å¡«å……
+- **crawler**ï¼šPlaywright æµè§ˆå™¨æŠ“å– + APScheduler å®šæ—¶è°ƒåº¦ï¼ˆæ¯ 4 å°æ—¶ + å¯åŠ¨æ—¶æ‰§è¡Œä¸€æ¬¡ï¼‰
+- **postgres**ï¼šæ•°æ®æŒä¹…åŒ–ï¼Œvolume æŒ‚è½½ `pgdata`
 
-## API ½Ó¿Ú
+## æ ¸å¿ƒåŠŸèƒ½
 
-| ·½·¨ | Â·¾¶ | ËµÃ÷ |
+### æ–°é—»æµè§ˆï¼ˆé¦–é¡µï¼‰
+
+- **åŠ¨æ€æ ç›®**ï¼šæ ç›®å’Œæ•°æ®æºä»åç«¯ `/api/categories` åŠ¨æ€è·å–ï¼Œä¸å†ç¡¬ç¼–ç 
+- **æ ‡ç­¾ç­›é€‰**ï¼šç‚¹å‡»æ ‡ç­¾è¿‡æ»¤å½“å‰æ ç›®ä¸‹çš„æ–°é—»
+- **å…³é”®è¯æœç´¢**ï¼šæ”¯æŒ 400ms é˜²æŠ–æœç´¢
+- **åˆ†é¡µæµè§ˆ**ï¼šæ¯é¡µ 20 æ¡
+- **ç§»åŠ¨ç«¯é€‚é…**ï¼šæ–­ç‚¹ 640px / 480pxï¼ŒTab æ¨ªå‘æ»šåŠ¨ã€å¡ç‰‡ç´§å‡‘æ’åˆ—
+
+### ç®¡ç†åå°ï¼ˆ`/admin`ï¼‰
+
+- **é‰´æƒ**ï¼šé€šè¿‡ `.env` ä¸­ `ADMIN_ENABLED` å¼€å…³ï¼Œ`ADMIN_PASSWORD` ç®€æ˜“å¯†ç é‰´æƒï¼ˆHeader `X-Admin-Key`ï¼‰
+- **æ•°æ®æºç®¡ç†**ï¼šæ–°å¢/ç¼–è¾‘/åˆ é™¤æ•°æ®æºï¼Œæ”¯æŒ JSON é…ç½®ç¼–è¾‘å™¨ + æ¨¡æ¿å‚è€ƒé¢æ¿
+- **æµ‹è¯•æŠ“å–**ï¼šå¯¹å•ä¸ªæ•°æ®æºæ‰§è¡Œæµ‹è¯•æŠ“å–ï¼Œé¢„è§ˆå‰ 10 æ¡ç»“æœï¼Œä¸å†™å…¥æ•°æ®åº“
+- **çˆ¬å–æ—¥å¿—**ï¼šæŸ¥çœ‹å†å²æŠ“å–è®°å½•ï¼ˆçŠ¶æ€/æ¡ç›®æ•°/è€—æ—¶/é”™è¯¯ä¿¡æ¯ï¼‰
+- **è§¦å‘å…¨é‡æŠ“å–**ï¼šæ‰‹åŠ¨è§¦å‘å¯¹æ‰€æœ‰æ´»è·ƒæºçš„æŠ“å–
+
+### æŠ“å–å¼•æ“
+
+ä¸‰å¥—é€šç”¨æŠ“å–å™¨ï¼Œé€šè¿‡æ•°æ®æº `config` JSON é…ç½®é©±åŠ¨ï¼Œæ— éœ€ä¸ºæ¯ä¸ªç«™ç‚¹å†™ä»£ç ï¼š
+
+| æŠ“å–ç±»å‹ | crawl_type | é€‚ç”¨åœºæ™¯ | ä¾èµ– |
+|----------|-----------|---------|------|
+| API æŠ“å– | `api` | æœ‰ JSON æ¥å£çš„ç«™ç‚¹ | httpx |
+| é€‰æ‹©å™¨æŠ“å– | `selector` | ä¼ ç»Ÿ HTML é¡µé¢ï¼ŒCSS é€‰æ‹©å™¨æå– | httpx + BeautifulSoup4 + lxml |
+| æµè§ˆå™¨æŠ“å– | `browser` | JS åŠ¨æ€æ¸²æŸ“é¡µé¢ | Playwright |
+
+æ¯ç§ç±»å‹æ”¯æŒå¯é€‰çš„æ·±åº¦æŠ“å–ï¼ˆ`fetch_content`ï¼‰ï¼Œå¼€å¯åè‡ªåŠ¨è¿›å…¥è¯¦æƒ…é¡µæå–æ­£æ–‡ã€‚
+
+## API æ¥å£
+
+### å…¬å¼€æ¥å£
+
+| æ–¹æ³• | è·¯å¾„ | è¯´æ˜ |
 |------|------|------|
-| GET | `/api/health` | ½¡¿µ¼ì²é |
-| GET | `/api/news` | ĞÂÎÅÁĞ±í£¨Ö§³Ö `page` / `size` / `search` / `source`£© |
-| POST | `/api/crawl/trigger` | ÊÖ¶¯´¥·¢ÅÀ³æ |
-| GET | `/api/crawl/logs` | ÅÀÈ¡ÈÕÖ¾£¨·ÖÒ³£© |
+| GET | `/api/health` | å¥åº·æ£€æŸ¥ |
+| GET | `/api/news` | æ–°é—»åˆ—è¡¨ï¼Œæ”¯æŒ `page`/`size`/`search`/`category`/`tags` |
+| GET | `/api/categories` | è¿”å›æ‰€æœ‰æ ç›®åŠæ¯ä¸ªæ ç›®ä¸‹çš„æ•°æ®æºåˆ—è¡¨ |
+| GET | `/api/tags` | è¿”å›æ ‡ç­¾åˆ—è¡¨ï¼Œå¯æŒ‰ `category` ç­›é€‰ |
 
-ÏìÓ¦¸ñÊ½Í³Ò»Îª `{ code, message, data }`£¬·ÖÒ³Êı¾İÊ¹ÓÃ `{ items, total, page, size }` °ü¹ü¡£
+### ç®¡ç†ç«¯æ¥å£ï¼ˆéœ€ `X-Admin-Key` è¯·æ±‚å¤´ï¼‰
 
-## ÅÀ³æÀ©Õ¹
+| æ–¹æ³• | è·¯å¾„ | è¯´æ˜ |
+|------|------|------|
+| GET | `/api/admin/sources` | æ•°æ®æºåˆ—è¡¨ï¼ˆåˆ†é¡µ + æœç´¢ï¼‰ |
+| POST | `/api/admin/sources` | æ–°å¢æ•°æ®æº |
+| PUT | `/api/admin/sources/{id}` | ç¼–è¾‘æ•°æ®æº |
+| DELETE | `/api/admin/sources/{id}` | åˆ é™¤æ•°æ®æº |
+| POST | `/api/admin/sources/{id}/test` | æµ‹è¯•æŠ“å–ï¼ˆé¢„è§ˆå‰ 10 æ¡ï¼‰ |
+| POST | `/api/admin/sources/{id}/crawl` | å¯¹å•ä¸ªæºæ‰§è¡Œæ­£å¼æŠ“å–å¹¶å…¥åº“ |
+| POST | `/api/admin/crawl/trigger` | è§¦å‘å…¨é‡çˆ¬å– |
+| GET | `/api/admin/crawl/logs` | çˆ¬å–æ—¥å¿—ï¼ˆåˆ†é¡µï¼‰ |
+| POST | `/api/admin/sources/test-config` | æœªä¿å­˜é…ç½®çš„æµ‹è¯•æŠ“å– |
 
-ÔÚ `backend/app/crawlers/sources/` ÏÂĞÂ½¨ÎÄ¼ş£¬¼Ì³Ğ `BaseCrawler` ²¢ÊµÏÖ `extract(page)` ·½·¨£¬È»ºóÔÚ `manager.py` ÖĞ×¢²á¼´¿É¡£
+å“åº”æ ¼å¼ç»Ÿä¸€ä¸º `{ code, message, data }`ï¼Œåˆ†é¡µæ¥å£ä½¿ç”¨ `{ items, total, page, size }` ç»“æ„ã€‚
 
-```python
-from app.crawlers.base import BaseCrawler
+## ç¯å¢ƒå˜é‡
 
-class MyCrawler(BaseCrawler):
-    name = "my_source"
-    source_name = "ÎÒµÄÀ´Ô´"
-    base_url = "https://example.com/news"
+| å˜é‡ | è¯´æ˜ | é»˜è®¤å€¼ |
+|------|------|--------|
+| POSTGRES_USER | æ•°æ®åº“ç”¨æˆ· | newsuser |
+| POSTGRES_PASSWORD | æ•°æ®åº“å¯†ç  | changeme123 |
+| POSTGRES_DB | æ•°æ®åº“å | news_hub |
+| POSTGRES_HOST | æ•°æ®åº“ä¸»æœº | postgres |
+| POSTGRES_PORT | æ•°æ®åº“ç«¯å£ | 5432 |
+| ENVIRONMENT | è¿è¡Œç¯å¢ƒ | development |
+| LOG_LEVEL | æ—¥å¿—çº§åˆ« | info |
+| ADMIN_ENABLED | æ˜¯å¦å¯ç”¨ç®¡ç†ç«¯é‰´æƒ | true |
+| ADMIN_PASSWORD | ç®¡ç†ç«¯å¯†ç  | admin123 |
+| TZ | æ—¶åŒº | Asia/Shanghai |
 
-    async def extract(self, page):
-        # ½âÎöÒ³Ãæ£¬·µ»Ø dict ÁĞ±í
-        # Ã¿ÌõÊı¾İĞè°üº¬£ºtitle, link, summary, pub_time, source_name
-        return items
+## æœåŠ¡å™¨éƒ¨ç½²ä¸æ›´æ–°
+
+### é¦–æ¬¡éƒ¨ç½²
+
+```bash
+# SSH åˆ°æœåŠ¡å™¨
+git clone https://github.com/dugujiuchi/xinwen.git /opt/xinwen/web_aisearch
+cd /opt/xinwen/web_aisearch
+
+# æ ¹æ®éœ€è¦åˆ›å»º .env è‡ªå®šä¹‰é…ç½®
+cp .env.example .env
+vi .env
+
+# å¯åŠ¨
+docker compose up -d
 ```
 
-## Êı¾İ¿âÇ¨ÒÆ
+æ³¨æ„ï¼šé˜¿é‡Œäº‘å®‰å…¨ç»„éœ€å¼€æ”¾ç«¯å£ 80ï¼ˆå‰ç«¯ï¼‰å’Œ 5433ï¼ˆæ•°æ®åº“è¿œç¨‹è®¿é—®ï¼‰ã€‚
+
+### æ›´æ–°ä»£ç 
+
+```bash
+cd /opt/xinwen/web_aisearch
+git pull
+docker compose up -d --build
+```
+
+### è¿œç¨‹æ•°æ®åº“è®¿é—®
+
+æœåŠ¡ç«¯ PostgreSQL ç«¯å£æ˜ å°„ä¸º `5433:5432`ã€‚Navicat ç­‰å®¢æˆ·ç«¯è¿æ¥å‚æ•°ï¼š
+
+| å‚æ•° | å€¼ |
+|------|-----|
+| Host | æœåŠ¡å™¨ IP |
+| Port | 5433 |
+| User | è§æœåŠ¡å™¨ `.env` æˆ–é»˜è®¤ `newsuser` |
+| Password | è§æœåŠ¡å™¨ `.env` æˆ–é»˜è®¤ `changeme123` |
+| Database | news_hub |
+
+## çˆ¬è™«æ‰©å±•
+
+ä¸å†éœ€è¦ç¼–å†™çˆ¬è™«ç±»ã€‚åœ¨ç®¡ç†åå° `/admin/sources/new` ä¸­æ–°å¢æ•°æ®æºï¼Œæ ¹æ®ç›®æ ‡ç«™ç‚¹é€‰æ‹©å¯¹åº”çš„ `crawl_type` å¹¶å¡«å†™ JSON é…ç½®å³å¯ã€‚é…ç½®æ¨¡æ¿å‚è€ƒè§ç®¡ç†ç«¯è¡¨å•é¡µå³ä¾§é¢æ¿ã€‚
+
+### é…ç½®ç¤ºä¾‹
+
+**API ç±»å‹**ï¼ˆå¦‚æå®¢å…¬å›­ã€é­”æ­ç¤¾åŒºï¼‰ï¼š
+```json
+{
+  "url": "https://api.example.com/articles",
+  "method": "GET",
+  "response_type": "json",
+  "item_path": "data.list",
+  "fetch_content": true,
+  "mapping": {
+    "title": "title",
+    "link": "url",
+    "time": "publishTime",
+    "summary": "abstract",
+    "content": "content",
+    "tags": "tagList"
+  }
+}
+```
+
+**Selector ç±»å‹**ï¼ˆå¦‚è‡ªç„¶èµ„æºéƒ¨ã€CSDNï¼‰ï¼š
+```json
+{
+  "url": "https://example.com/news",
+  "encoding": "utf-8",
+  "list_selector": ".news-list li",
+  "fetch_content": false,
+  "mapping": {
+    "title": { "selector": "h3 a", "attr": "text" },
+    "link": { "selector": "h3 a", "attr": "href" },
+    "time": { "selector": "span.date", "attr": "text" },
+    "summary": { "selector": "p.desc", "attr": "text" }
+  }
+}
+```
+
+## æ•°æ®åº“è¿ç§»
 
 ```bash
 cd backend
 
-# Éú³ÉÇ¨ÒÆ½Å±¾
-alembic revision --autogenerate -m "ÃèÊö"
+# ç”Ÿæˆè¿ç§»è„šæœ¬
+alembic revision --autogenerate -m "æè¿°"
 
-# Ö´ĞĞÇ¨ÒÆ
+# æ‰§è¡Œè¿ç§»
 alembic upgrade head
 ```
 
-## ÔËĞĞ²âÊÔ
+## è¿è¡Œæµ‹è¯•
 
 ```bash
-# ºó¶Ë
-docker-compose run --rm api pytest tests/ -v
+# å®¹å™¨å†…
+docker compose run --rm api pytest tests/ -v
 
-# »ò±¾µØ
+# æœ¬åœ°
 cd backend && pytest tests/ -v
 ```
-
-## ¶şÆÚ¹æ»®
-
-- [ ] ÓÃ»§ÏµÍ³£¨×¢²á / µÇÂ¼ / JWT ÈÏÖ¤£©
-- [ ] Ö÷Ìâ¹ÜÀí API + Ç°¶ËÒ³Ãæ
-- [ ] "ÎÒµÄ¶©ÔÄ"¹¦ÄÜ
-- [ ] ÅÀ³æ×Ô¶¯¹ØÁªÖ÷Ìâ£¨¹Ø¼ü´ÊÆ¥Åä£©
-- [ ] jieba ÖĞÎÄ·Ö´ÊËÑË÷
-- [ ] ¹ÜÀíºóÌ¨£¨ÅÀ³æ×´Ì¬¼à¿Ø / ÓÃ»§¹ÜÀí£©
-
-## »·¾³±äÁ¿
-
-| ±äÁ¿ | ËµÃ÷ | Ä¬ÈÏÖµ |
-|------|------|--------|
-| POSTGRES_USER | Êı¾İ¿âÓÃ»§ | newsuser |
-| POSTGRES_PASSWORD | Êı¾İ¿âÃÜÂë | changeme123 |
-| POSTGRES_DB | Êı¾İ¿âÃû | news_hub |
-| POSTGRES_HOST | Êı¾İ¿âÖ÷»ú | postgres |
-| POSTGRES_PORT | Êı¾İ¿â¶Ë¿Ú | 5432 |
-| ENVIRONMENT | ÔËĞĞ»·¾³ | development |
-| LOG_LEVEL | ÈÕÖ¾¼¶±ğ | info |
