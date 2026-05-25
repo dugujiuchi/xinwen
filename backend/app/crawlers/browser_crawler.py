@@ -2,6 +2,7 @@
 import json
 import logging
 import time
+import threading
 from random import uniform
 from urllib.parse import urljoin
 
@@ -12,6 +13,26 @@ from app.models.source import Source
 
 logger = logging.getLogger("crawler.browser")
 
+_playwright = None
+_browser = None
+_lock = threading.Lock()
+
+
+def _get_browser():
+    """获取复用的浏览器实例（模块级单例，减少进程创建）。"""
+    global _playwright, _browser
+    if _browser is None:
+        _playwright = sync_playwright().start()
+        _browser = _playwright.chromium.launch(
+            headless=True,
+            args=[
+                "--disable-blink-features=AutomationControlled",
+                "--no-sandbox",
+                "--disable-dev-shm-usage",
+            ],
+        )
+    return _browser
+
 
 class BrowserCrawler(BaseCrawler):
     """适用于需要 JS 渲染的动态页面。
@@ -19,6 +40,8 @@ class BrowserCrawler(BaseCrawler):
     支持两种提取模式：
     - "dom"（默认）：渲染后获取 HTML，用 CSS 选择器提取
     - "js_state"：从 window.__INITIAL_STATE__ 等 JS 全局变量提取
+
+    Playwright 浏览器实例在模块级别复用，避免反复创建/销毁 Chrome 进程导致僵尸进程。
     """
 
     page_timeout: int = 60000
@@ -35,14 +58,8 @@ class BrowserCrawler(BaseCrawler):
         fetch_content = config.get("fetch_content", False)
         content_selector = config.get("content_selector")
 
-        with sync_playwright() as p:
-            browser = p.chromium.launch(
-                headless=True,
-                args=[
-                    "--disable-blink-features=AutomationControlled",
-                    "--no-sandbox",
-                ],
-            )
+        with _lock:
+            browser = _get_browser()
             try:
                 context = browser.new_context(
                     user_agent=(
@@ -87,7 +104,10 @@ class BrowserCrawler(BaseCrawler):
                 logger.warning("%s 抓取失败: %r", source.name, e)
                 return []
             finally:
-                browser.close()
+                try:
+                    context.close()
+                except Exception:
+                    pass
 
     # ------------------------------------------------------------------
     # DOM 模式提取

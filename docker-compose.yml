@@ -46,6 +46,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile.crawler
     container_name: news-crawler
+    init: true
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-newsuser}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme123}
