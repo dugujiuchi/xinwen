@@ -7,7 +7,16 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme123}
       POSTGRES_DB: ${POSTGRES_DB:-news_hub}
       TZ: Asia/Shanghai
-    mem_limit: 256m
+    mem_limit: 512m
+    command: >
+      postgres
+      -c shared_buffers=128MB
+      -c effective_cache_size=384MB
+      -c work_mem=8MB
+      -c maintenance_work_mem=64MB
+      -c wal_buffers=16MB
+      -c random_page_cost=1.1
+      -c max_connections=30
     ports:
       - "5433:5432"
     volumes:
@@ -33,7 +42,7 @@ services:
       POSTGRES_PORT: 5432
       ENVIRONMENT: ${ENVIRONMENT:-development}
       TZ: Asia/Shanghai
-    mem_limit: 512m
+    mem_limit: 256m
     ports:
       - "8000:8000"
     depends_on:
@@ -54,7 +63,7 @@ services:
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
       TZ: Asia/Shanghai
-    mem_limit: 1g
+    mem_limit: 512m
     depends_on:
       postgres:
         condition: service_healthy

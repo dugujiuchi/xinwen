@@ -43,6 +43,14 @@ class CrawlerManager:
         for source in sources:
             result = self.run_one(source.id)
             results.append(result)
+
+        # 每次批量爬取结束后释放 Chrome 内存
+        try:
+            from app.crawlers.browser_crawler import cleanup_browser
+            cleanup_browser()
+        except Exception:
+            pass
+
         return results
 
     def run_one(self, source_id: int) -> dict:

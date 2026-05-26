@@ -29,9 +29,29 @@ def _get_browser():
                 "--disable-blink-features=AutomationControlled",
                 "--no-sandbox",
                 "--disable-dev-shm-usage",
+                "--disable-gpu",
+                "--single-process",
             ],
         )
     return _browser
+
+
+def cleanup_browser():
+    """销毁浏览器实例，释放内存（每次爬取任务结束后调用）。"""
+    global _playwright, _browser
+    with _lock:
+        if _browser is not None:
+            try:
+                _browser.close()
+            except Exception:
+                pass
+            _browser = None
+        if _playwright is not None:
+            try:
+                _playwright.stop()
+            except Exception:
+                pass
+            _playwright = None
 
 
 class BrowserCrawler(BaseCrawler):
