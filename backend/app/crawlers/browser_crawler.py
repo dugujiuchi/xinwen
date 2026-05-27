@@ -30,7 +30,6 @@ def _get_browser():
                 "--no-sandbox",
                 "--disable-dev-shm-usage",
                 "--disable-gpu",
-                "--single-process",
             ],
         )
     return _browser
