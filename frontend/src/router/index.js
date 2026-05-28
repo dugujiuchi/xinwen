@@ -4,6 +4,7 @@ import AdminLayout from '../views/AdminLayout.vue'
 import SourceList from '../views/SourceList.vue'
 import SourceForm from '../views/SourceForm.vue'
 import CrawlLogs from '../views/CrawlLogs.vue'
+import VisitorLogs from '../views/VisitorLogs.vue'
 
 const routes = [
   { path: '/', name: 'home', component: Home },
@@ -16,6 +17,7 @@ const routes = [
       { path: 'sources/new', name: 'source-create', component: SourceForm },
       { path: 'sources/:id/edit', name: 'source-edit', component: SourceForm },
       { path: 'crawl-logs', name: 'crawl-logs', component: CrawlLogs },
+      { path: 'visitor-logs', name: 'visitor-logs', component: VisitorLogs },
     ],
   },
 ]

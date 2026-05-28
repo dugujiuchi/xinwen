@@ -106,4 +106,17 @@ export function verifyAdminPassword(password) {
   return api.get('/admin/sources', { params: { size: 1 }, headers: { 'X-Admin-Key': password } })
 }
 
+// 访客记录
+export function recordVisit() {
+  return api.post('/visitor/record')
+}
+
+export function fetchVisitorStats(period = 'week') {
+  return api.get('/visitor/admin/stats', { params: { period }, headers: getAdminHeaders() })
+}
+
+export function fetchVisitorLogs(params = {}) {
+  return api.get('/visitor/admin/logs', { params, headers: getAdminHeaders() })
+}
+
 export default api

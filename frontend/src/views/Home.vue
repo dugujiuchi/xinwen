@@ -17,7 +17,7 @@
 
 <script setup>
 import { ref, watch, computed, onMounted, onUnmounted } from 'vue'
-import { fetchNews, fetchCategories, fetchTags, categoryLabelMap } from '../api/index.js'
+import { fetchNews, fetchCategories, fetchTags, categoryLabelMap, recordVisit } from '../api/index.js'
 import SearchBar from '../components/SearchBar.vue'
 import TabNav from '../components/TabNav.vue'
 import TagFilter from '../components/TagFilter.vue'
@@ -41,8 +41,9 @@ const currentTags = computed(() => {
   return [{ key: '', label: '全部' }, ...tags.map(t => ({ key: t, label: t }))]
 })
 
-// 初始化：获取分类
+// 初始化：获取分类 + 记录访问
 onMounted(async () => {
+  recordVisit().catch(() => {})
   try {
     const catResp = await fetchCategories()
     const categories = catResp.data || {}

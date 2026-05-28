@@ -8,8 +8,10 @@ from sqlalchemy.orm import Session
 from app.database import engine, Base, SessionLocal, get_db
 from app.api.news import router as news_router
 from app.api.admin import router as admin_router
+from app.api.visitor import router as visitor_router
 from app.models.news import News
 from app.models.source import Source
+from app.models.visitor_log import VisitorLog
 from scripts.seed_sources import seed_sources
 
 
@@ -63,6 +65,7 @@ app.add_middleware(
 
 app.include_router(news_router)
 app.include_router(admin_router)
+app.include_router(visitor_router)
 
 
 @app.get("/api/categories")

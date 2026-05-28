@@ -47,6 +47,13 @@
             >
               爬取日志
             </router-link>
+            <router-link
+              to="/admin/visitor-logs"
+              class="admin-nav-item"
+              active-class="admin-nav-item--active"
+            >
+              访客记录
+            </router-link>
           </nav>
         </aside>
 
