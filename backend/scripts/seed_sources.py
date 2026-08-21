@@ -11,6 +11,8 @@ Usage:
     db.close()
 """
 
+import json
+
 from sqlalchemy.orm import Session
 
 from app.models.source import Source
@@ -355,21 +357,35 @@ def _build_sources() -> list[dict]:
             "name": "modelscope_academy",
             "display_name": "ModelScope学院",
             "category": "tech",
-            "crawl_type": "browser",
+            "crawl_type": "api",
             "sort_order": 24,
-            # 注意：modelscope.cn 是 CSS-in-JS 哈希 class，选择器只能用
-            # URL 前缀 + img[alt] 等语义锚点；wait_ms 等 SPA 渲染完成再提取
+            # 原 browser 方案在 2C2G+3Mbps 服务器上渲染慢（3.5 分钟仅 1 条），
+            # 改用官方 JSON 接口：POST dolphin/articles，文章链接用 {Id} 模板
+            # （接口 Url 字段为空，Path 是作者名不能用）；Tags 是 JSON 字符串
+            # 且为原始搜索标签，不映射，回退为源名口径
             "config": {
-                "url": "https://modelscope.cn/learn?page=1&query=前沿技术&sort=hot",
-                "wait_selector": "a[href^='/learn/']",
-                "wait_ms": 4000,
-                "scroll_times": 1,
-                "list_selector": "a[href^='/learn/']",
-                "mapping": {
-                    "title": {"selector": "img[alt]", "attr": "alt"},
-                    "link": {"selector": "", "attr": "href"},
+                "url": "https://modelscope.cn/api/v1/dolphin/articles",
+                "method": "POST",
+                "headers": {
+                    "Content-Type": "application/json",
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                    "Referer": "https://modelscope.cn/learn",
                 },
+                "body": json.dumps(
+                    {"PageSize": 20, "PageNumber": 1, "Type": 2,
+                     "Sort": "hot", "Query": "前沿技术", "IsCourse": [0, 1]},
+                    ensure_ascii=False,
+                ),
+                "response_type": "json",
+                "item_path": "Data.Articles",
                 "fetch_content": False,
+                "mapping": {
+                    "title": "Title",
+                    "link": "https://modelscope.cn/learn/{Id}",
+                    "time": "GmtPublished",
+                    "time_type": "timestamp",
+                    "summary": "Desc",
+                },
             },
         },
         # ============================================================
