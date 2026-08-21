@@ -13,17 +13,19 @@ from app.models.source import Source
 
 logger = logging.getLogger("crawler.browser")
 
-_playwright = None
-_browser = None
+# Playwright 同步 API 对象绑定创建它的线程（greenlet 亲和性），
+# 且 CrawlerManager 为每个数据源在独立工作线程中执行 fetch，
+# 因此浏览器实例必须按线程隔离（threading.local），
+# 并由同一线程在 fetch 结束后显式关闭，否则 chromium 进程泄漏成僵尸。
+_browser_local = threading.local()
 _lock = threading.Lock()
 
 
 def _get_browser():
-    """获取复用的浏览器实例（模块级单例，减少进程创建）。"""
-    global _playwright, _browser
-    if _browser is None:
-        _playwright = sync_playwright().start()
-        _browser = _playwright.chromium.launch(
+    """获取当前线程复用的浏览器实例（线程内首次调用时启动 Chromium）。"""
+    if getattr(_browser_local, "browser", None) is None:
+        _browser_local.playwright = sync_playwright().start()
+        _browser_local.browser = _browser_local.playwright.chromium.launch(
             headless=True,
             args=[
                 "--disable-blink-features=AutomationControlled",
@@ -32,25 +34,29 @@ def _get_browser():
                 "--disable-gpu",
             ],
         )
-    return _browser
+    return _browser_local.browser
 
 
 def cleanup_browser():
-    """销毁浏览器实例，释放内存（每次爬取任务结束后调用）。"""
-    global _playwright, _browser
-    with _lock:
-        if _browser is not None:
-            try:
-                _browser.close()
-            except Exception:
-                pass
-            _browser = None
-        if _playwright is not None:
-            try:
-                _playwright.stop()
-            except Exception:
-                pass
-            _playwright = None
+    """关闭当前线程的浏览器实例，释放内存。
+
+    必须与 _get_browser 在同一线程中调用（Playwright 线程亲和性）；
+    对其他线程无副作用。
+    """
+    playwright = getattr(_browser_local, "playwright", None)
+    browser = getattr(_browser_local, "browser", None)
+    if browser is not None:
+        try:
+            browser.close()
+        except Exception:
+            pass
+    if playwright is not None:
+        try:
+            playwright.stop()
+        except Exception:
+            pass
+    _browser_local.browser = None
+    _browser_local.playwright = None
 
 
 class BrowserCrawler(BaseCrawler):

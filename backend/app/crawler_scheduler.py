@@ -50,12 +50,13 @@ scheduler = BackgroundScheduler(
 )
 
 # 每 4 小时定时执行
+# 不设 next_run_time=now：立即首次抓取由下方 startup 任务负责，
+# 否则启动瞬间会产生两轮并发全量爬取
 scheduler.add_job(
     crawl_job,
     "interval",
     hours=4,
     id="crawl_job_interval",
-    next_run_time=datetime.now(timezone(timedelta(hours=8))),
 )
 
 # 每天 09:10 补充执行

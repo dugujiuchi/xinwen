@@ -85,12 +85,7 @@ class CrawlerManager:
             result = self.run_one(source.id, timeout=DEFAULT_SOURCE_TIMEOUT)
             results.append(result)
 
-        # 每次批量爬取结束后释放 Chrome 内存
-        try:
-            from app.crawlers.browser_crawler import cleanup_browser
-            cleanup_browser()
-        except Exception:
-            pass
+        # 浏览器内存已在各工作线程退出时释放（thread-local，见 _fetch_with_timeout）
 
         # 汇总统计
         success = sum(1 for r in results if r.get("status") == "success")
@@ -194,6 +189,13 @@ class CrawlerManager:
             except Exception as e:
                 error_container = e
             finally:
+                # 工作线程退出前关闭本线程的 Chromium（Playwright 绑定创建线程，
+                # chromium 进程必须由 Python 侧显式关闭，否则泄漏成僵尸进程）
+                try:
+                    from app.crawlers.browser_crawler import cleanup_browser
+                    cleanup_browser()
+                except Exception:
+                    pass
                 done.set()
 
         thread = threading.Thread(target=_target, daemon=True)
