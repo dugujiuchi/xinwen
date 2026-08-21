@@ -1,4 +1,10 @@
-"""爬虫管理器 — DB 驱动，从 Source 表读取活跃源并抓取"""
+"""爬虫管理器 — DB 驱动，从 Source 表读取活跃源并抓取
+
+支持：
+- 单源超时保护（默认 10 分钟），防止个别源卡住阻塞整体调度
+- 总超时保护（run_all 级别），防止整体运行时间超过调度间隔
+- 进度日志，便于定位慢/卡住的数据源
+"""
 import logging
 from datetime import datetime, timezone
 
@@ -8,9 +14,18 @@ from app.database import SessionLocal
 from app.models.crawl import CrawlLog
 from app.models.news import News
 from app.models.source import Source
+from app.crawlers.base import BaseCrawler
 from app.crawlers.factory import CrawlerFactory
 
 logger = logging.getLogger("crawler.manager")
+
+# 单个数据源抓取超时（秒）
+DEFAULT_SOURCE_TIMEOUT = 600  # 10 分钟
+
+
+class SourceTimeoutError(Exception):
+    """单个数据源抓取超时异常。"""
+    pass
 
 
 class CrawlerManager:
@@ -20,10 +35,14 @@ class CrawlerManager:
     - 通过 CrawlerFactory 自动选择合适的 Fetcher
     - 串行执行，自动去重、写入数据库
     - 记录运行日志
+    - 单源超时保护 + 总超时保护
     """
 
-    def run_all(self) -> list[dict]:
+    def run_all(self, timeout_seconds: float | None = None) -> list[dict]:
         """遍历所有活跃 Source，串行抓取。
+
+        Args:
+            timeout_seconds: 整体超时（秒），超时后跳过剩余源。None 表示不限制。
 
         Returns:
             每个源的抓取结果列表
@@ -39,9 +58,31 @@ class CrawlerManager:
         finally:
             db.close()
 
+        total = len(sources)
+        logger.info("共 %d 个活跃数据源待抓取", total)
+
+        overall_start = datetime.now(timezone.utc)
         results = []
-        for source in sources:
-            result = self.run_one(source.id)
+
+        for idx, source in enumerate(sources, start=1):
+            # 整体超时检查
+            if timeout_seconds:
+                elapsed = (datetime.now(timezone.utc) - overall_start).total_seconds()
+                if elapsed >= timeout_seconds:
+                    logger.warning(
+                        "整体超时（%.0fs ≥ %.0fs），跳过剩余 %d 个源",
+                        elapsed, timeout_seconds, total - idx + 1,
+                    )
+                    for remaining in sources[idx - 1:]:
+                        results.append({
+                            "name": remaining.name,
+                            "status": "skipped",
+                            "error": "整体超时，本轮跳过",
+                        })
+                    break
+
+            logger.info("[%d/%d] 正在抓取: %s", idx, total, source.name)
+            result = self.run_one(source.id, timeout=DEFAULT_SOURCE_TIMEOUT)
             results.append(result)
 
         # 每次批量爬取结束后释放 Chrome 内存
@@ -51,13 +92,24 @@ class CrawlerManager:
         except Exception:
             pass
 
+        # 汇总统计
+        success = sum(1 for r in results if r.get("status") == "success")
+        failed = sum(1 for r in results if r.get("status") == "failed")
+        skipped = sum(1 for r in results if r.get("status") == "skipped")
+        total_elapsed = (datetime.now(timezone.utc) - overall_start).total_seconds()
+        logger.info(
+            "本轮抓取完成: 成功=%d 失败=%d 跳过=%d 总耗时=%.0fs",
+            success, failed, skipped, total_elapsed,
+        )
+
         return results
 
-    def run_one(self, source_id: int) -> dict:
-        """抓取单个源（按 source.id）。
+    def run_one(self, source_id: int, timeout: float = DEFAULT_SOURCE_TIMEOUT) -> dict:
+        """抓取单个源（按 source.id），带超时保护。
 
         Args:
             source_id: 数据源 ID
+            timeout: 单源超时（秒），超时后返回 failed 结果
 
         Returns:
             {"name": ..., "status": "success"|"failed", "count": ..., "error": ...}
@@ -84,7 +136,8 @@ class CrawlerManager:
                 logger.info("[%s] 开始抓取...", source.name)
 
                 crawler = CrawlerFactory.get_crawler(source.crawl_type)
-                items = crawler.fetch(source)
+
+                items = self._fetch_with_timeout(crawler, source, timeout)
 
                 count = self._save_items(db, items, source)
 
@@ -95,6 +148,13 @@ class CrawlerManager:
 
                 logger.info("[%s] 完成，获取 %d 条", source.name, count)
                 return {"name": source.name, "status": "success", "count": count}
+            except SourceTimeoutError:
+                log.status = "failed"
+                log.error_message = f"单源超时（{timeout}s）"
+                log.finished_at = datetime.now(timezone.utc)
+                db.commit()
+                logger.warning("[%s] 超时（%ds），跳过", source.name, timeout)
+                return {"name": source.name, "status": "failed", "error": f"超时（{timeout}s）"}
             except Exception as e:
                 log.status = "failed"
                 log.error_message = repr(e)
@@ -104,6 +164,50 @@ class CrawlerManager:
                 return {"name": source.name, "status": "failed", "error": repr(e)}
         finally:
             db.close()
+
+    @staticmethod
+    def _fetch_with_timeout(crawler, source: Source, timeout: float) -> list[dict]:
+        """在独立线程中执行抓取，超时则抛出 SourceTimeoutError。
+
+        Args:
+            crawler: Crawler 实例
+            source: 数据源模型
+            timeout: 超时秒数
+
+        Returns:
+            抓取结果列表
+
+        Raises:
+            SourceTimeoutError: 抓取超时
+        """
+        import threading
+
+        result_container: list = []
+        error_container: Exception | None = None
+        done = threading.Event()
+
+        def _target():
+            nonlocal error_container
+            try:
+                items = crawler.fetch(source)
+                result_container.extend(items)
+            except Exception as e:
+                error_container = e
+            finally:
+                done.set()
+
+        thread = threading.Thread(target=_target, daemon=True)
+        thread.start()
+
+        if not done.wait(timeout=timeout):
+            raise SourceTimeoutError(
+                f"[{source.name}] 抓取超时（{timeout}s），线程将被丢弃"
+            )
+
+        if error_container:
+            raise error_container
+
+        return list(result_container)
 
     def _save_items(
         self, db: Session, items: list[dict], source: Source
@@ -119,16 +223,25 @@ class CrawlerManager:
             新增条数
         """
         count = 0
+        # 同批次内已见过的 link（会话 autoflush=False，DB 查询看不到待插入行，
+        # 必须用本地集合兜底，否则单批次内重复 link 会触发唯一约束冲突）
+        seen_links: set[str] = set()
         for item in items:
-            # link 截断（字段长度 2048）
-            link = (item.get("link") or "")[:2048]
+            # 归一化 link（剥离 request_id / utm_* 等追踪参数），保证去重 key 稳定；
+            # 再截断（字段长度 2048）
+            link = (item.get("link") or "").strip()
+            if link:
+                link = BaseCrawler.canonicalize_link(link)[:2048]
             if not link:
                 continue
 
-            # 按 link 去重
+            # 按 link 去重（批次内 + 数据库）
+            if link in seen_links:
+                continue
             exists = db.query(News).filter(News.link == link).first()
             if exists:
                 continue
+            seen_links.add(link)
 
             # tags：优先用抓取到的标签，没有则用数据源名称
             tags = item.get("tags")

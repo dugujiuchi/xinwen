@@ -70,6 +70,7 @@ class BrowserCrawler(BaseCrawler):
         config = source.config
         url = config["url"]
         scroll_times = config.get("scroll_times", 0)
+        wait_ms = int(config.get("wait_ms", 0) or 0)
         wait_selector = config.get("wait_selector")
         list_selector = config.get("list_selector", "")
         extract_mode = config.get("extract_mode", "dom")
@@ -98,6 +99,11 @@ class BrowserCrawler(BaseCrawler):
                         logger.warning("wait_selector 超时: %s", wait_selector)
 
                 _scroll(page, scroll_times)
+
+                # wait_selector 只能保证"出现"，不能保证"渲染完成"；
+                # 对渐进渲染的 SPA 页面，额外等待 wait_ms 毫秒再提取
+                if wait_ms:
+                    time.sleep(wait_ms / 1000.0)
 
                 if extract_mode == "js_state":
                     items = self._extract_js_state(page, config)

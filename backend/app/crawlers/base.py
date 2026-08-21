@@ -10,6 +10,18 @@ from app.models.source import Source
 logger = logging.getLogger("crawler")
 CRAWL_TYPES = ("api", "selector", "browser")
 
+# 常见追踪参数（归一化链接时剥离，保证去重 key 稳定）
+TRACKING_PARAMS = {
+    "request_id",
+    "ops_request_misc",
+    "biz_id",
+    "trace_id",
+    "spm",
+    "scm",
+    "ab_test_code_overlap",
+    "ab_test_random_code",
+}
+
 
 class BaseCrawler(ABC):
     """爬虫抽象基类。所有 Fetcher 实现 fetch() 方法。"""
@@ -259,6 +271,29 @@ class BaseCrawler(ABC):
             else:
                 result[field] = config_value
         return result
+
+    @staticmethod
+    def canonicalize_link(link: str) -> str:
+        """归一化链接：剥离追踪参数（request_id / utm_* / spm 等），
+        返回稳定的 URL 用于去重与展示。
+
+        注意：只剥离已知追踪参数，保留功能性 query（如 ?aid=123），
+        避免破坏以 query 携带资源 ID 的链接。
+        """
+        from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
+
+        if not link or "?" not in link:
+            return link
+        parts = urlsplit(link)
+        pairs = parse_qsl(parts.query, keep_blank_values=True)
+        kept = [
+            (k, v)
+            for k, v in pairs
+            if k not in TRACKING_PARAMS and not k.lower().startswith("utm_")
+        ]
+        if len(kept) == len(pairs):
+            return link
+        return urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(kept), ""))
 
     @staticmethod
     def _strip_html(text: str) -> str:

@@ -359,14 +359,17 @@ def _build_sources() -> list[dict]:
             "category": "tech",
             "crawl_type": "browser",
             "sort_order": 24,
+            # 注意：modelscope.cn 是 CSS-in-JS 哈希 class，选择器只能用
+            # URL 前缀 + img[alt] 等语义锚点；wait_ms 等 SPA 渲染完成再提取
             "config": {
                 "url": "https://modelscope.cn/learn?page=1&query=前沿技术&sort=hot",
-                "wait_selector": ".css-l6sb4f",
-                "list_selector": ".antd5-col",
+                "wait_selector": "a[href^='/learn/']",
+                "wait_ms": 4000,
+                "scroll_times": 1,
+                "list_selector": "a[href^='/learn/']",
                 "mapping": {
-                    "title": {"selector": ".acss-1m97cav", "attr": "text"},
-                    "link": {"selector": "a", "attr": "href"},
-                    "time": {"selector": ".acss-1bx5u27", "attr": "text"},
+                    "title": {"selector": "img[alt]", "attr": "alt"},
+                    "link": {"selector": "", "attr": "href"},
                 },
                 "fetch_content": False,
             },

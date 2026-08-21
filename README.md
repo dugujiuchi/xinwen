@@ -171,6 +171,8 @@ npm run dev
 
 每种类型支持可选的深度抓取（`fetch_content`），开启后自动进入详情页提取正文。
 
+去重说明：入库前会对 `link` 做归一化（自动剥离 `request_id`、`utm_*` 等每次请求都变化的追踪参数，保留 `?aid=123` 这类功能性参数），再按 `link` 唯一约束去重。历史数据可用 `python -m scripts.clean_duplicate_news` 一键清理（删除重复行并归一化存量 link）。Browser 类型还支持 `wait_ms` 配置，用于等待 SPA 渐进渲染完成后再提取。
+
 ## API 接口
 
 ### 公开接口

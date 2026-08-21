@@ -10,12 +10,12 @@ from app.models.news import News
 
 @pytest.fixture(autouse=True)
 def setup_db():
-    """每个测试前重建表"""
+    """每个测试前清空 news 表（前置清理，保证用例可重复执行）"""
     Base.metadata.create_all(bind=engine)
-    yield
     with SessionLocal() as db:
         db.query(News).delete()
         db.commit()
+    yield
 
 
 client = TestClient(app)

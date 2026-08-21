@@ -274,6 +274,7 @@ const configTemplates = {
     url: 'https://example.com/news',
     scroll_times: 3,
     wait_selector: '.article-list',
+    wait_ms: 3000,
     extract_mode: 'dom',
     fetch_content: false,
     mapping: {
